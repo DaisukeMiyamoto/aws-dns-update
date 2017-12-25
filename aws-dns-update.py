@@ -1,22 +1,16 @@
 import boto3
-import json
 import requests
-import pprint
-
-# curl httpbin.org/ip
+import time
 
 
 def get_my_ip():
-    response = requests.get(
-        'http://httpbin.org/ip'
-    )
-    # pprint.pprint(response.json())
+    response = requests.get('http://httpbin.org/ip')
     ip = response.json()['origin']
 
     return ip
 
 
-def update_dns(record_name, zone_name):
+def update_dns(record_name, zone_name, check=True):
 
     ip = get_my_ip()
 
@@ -48,11 +42,18 @@ def update_dns(record_name, zone_name):
         }
     )
 
-    pprint.pprint(response)
+    # pprint.pprint(response)
+    print('Set %s: %s' % (record_name + '.' + zone_name, ip))
 
     # check update
+    while check:
+        time.sleep(2)
+        response = route53.get_change(Id=response['ChangeInfo']['Id'])
+        if response['ChangeInfo']['Status'] == 'INSYNC':
+            print('OK')
+            break
 
 
-if __name__== '__main__':
-    update_dns('test', 'brain.sc')
+if __name__ == '__main__':
+    update_dns(record_name='test', zone_name='brain.sc')
 
