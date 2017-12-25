@@ -16,37 +16,43 @@ def get_my_ip():
     return ip
 
 
-zone_name = 'brain.sc'
-record_name = 'test'
+def update_dns(record_name, zone_name):
 
-ip = get_my_ip()
+    ip = get_my_ip()
 
-route53 = boto3.client('route53')
-response = route53.list_hosted_zones_by_name(DNSName=zone_name)
-zone_id = response['HostedZones'][0]['Id']
-pprint.pprint(response)
+    route53 = boto3.client('route53')
 
-zone_id = 'Z2Q83GQ64I782R'
-response = route53.change_resource_record_sets(
-    HostedZoneId=zone_id,
-    ChangeBatch={
-        'Changes': [
-            {
-                'Action': 'UPSERT',
-                'ResourceRecordSet': {
-                    'Name': record_name + '.' + zone_name,
-                    'Type': 'A',
-                    'TTL': 300,
-                    'ResourceRecords': [
-                        {
-                            'Value': ip
-                        }
-                    ]
+    # get zone Id
+    response = route53.list_hosted_zones_by_name(DNSName=zone_name)
+    zone_id = response['HostedZones'][0]['Id']
+
+    # update record
+    response = route53.change_resource_record_sets(
+        HostedZoneId=zone_id,
+        ChangeBatch={
+            'Changes': [
+                {
+                    'Action': 'UPSERT',
+                    'ResourceRecordSet': {
+                        'Name': record_name + '.' + zone_name,
+                        'Type': 'A',
+                        'TTL': 300,
+                        'ResourceRecords': [
+                            {
+                                'Value': ip
+                            }
+                        ]
+                    }
                 }
-            }
-        ]
-    }
-)
+            ]
+        }
+    )
 
-pprint.pprint(response)
+    pprint.pprint(response)
+
+    # check update
+
+
+if __name__== '__main__':
+    update_dns('test', 'brain.sc')
 
