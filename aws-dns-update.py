@@ -10,9 +10,10 @@ def get_my_ip():
     return ip
 
 
-def update_dns(record_name, zone_name, check=True):
+def update_dns(record_name, zone_name, ip=None, check=True):
 
-    ip = get_my_ip()
+    if not ip:
+        ip = get_my_ip()
 
     route53 = boto3.client('route53')
 
