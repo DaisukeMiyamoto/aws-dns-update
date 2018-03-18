@@ -10,10 +10,14 @@ update route 53 for DDNS
 
 ## usage
 
-
-set current global ip to test.hogehoge.com
+### set current global ip to test.hogehoge.com
 
 ```
-update_dns(record_name='test', zone_name='hogehoge.com')
+$ python3 aws-dns-update.py test hogehoge.com
 ```
 
+### set `123.123.123.123` to test.hogehoge.com
+
+```
+$ python3 aws-dns-update.py test hogehoge.com 123.123.123.123
+```
